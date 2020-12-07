@@ -1,0 +1,120 @@
+<html>
+	<body>
+      	<h1> Please choose time log file from the below button. </h1>
+      	</br></br>
+      	<input type="file" id="myfile" name="upload file">
+      	<br><br>
+      	<button onclick="loadFile()"> Calculate </button>
+      	<br/><br/>
+	<div id="print"></div><hr>
+	
+      	
+      	<script>
+      		function loadFile(){
+  			var fileToLoad = document.getElementById("myfile").files[0];
+
+  			var fileReader = new FileReader();
+  			fileReader.onload = function(fileLoadedEvent){
+      		var textFromFileLoaded = fileLoadedEvent.target.result;
+
+			var str1 = textFromFileLoaded.split('\n');
+			var result = "";
+			var projectTime = 0;
+			for(var i=1; i<str1.length; i++){
+				var fr = "";
+				var sc = "";
+				if(str1[i] != undefined && (str1[i].includes('am') || str1[i].includes('pm'))) {
+					var str2 = str1[i].split(' - ');
+					if(str2[0].includes(': ')) {
+						if(str2[0].split(': ')[1].includes('am')) {
+							fr = str2[0].split(': ')[1].split('am')[0].trim() + " am";
+							//result += str2[0].split(': ')[1] + " - ";
+							result += fr + " - ";
+						}
+						else {
+							fr = str2[0].split(': ')[1].split('pm')[0].trim() + " pm";
+							if(!fr.split(':')[0].includes('12')) {
+								fr = (parseInt(fr.split(':')[0])+12)+":"+fr.split(':')[1];
+							}
+							//result += str2[0].split(': ')[1] + " - ";
+							result += fr + " - ";
+						}
+						
+					}
+					else {
+						if(str2[0].includes('am')) {
+							fr = str2[0].split('am')[0].trim() + " am";
+							result += fr + " - ";
+						}
+						else {
+							fr = str2[0].split('pm')[0].trim() + " pm";
+							if(!fr.split(':')[0].includes('12')) {
+								fr = (parseInt(fr.split(':')[0])+12)+":"+fr.split(':')[1];
+							}
+							result += fr + " - ";
+						}
+						
+					}
+					if(str2[1] !== undefined) {
+						if(str2[1].split(' ')[0].includes('am')) {
+							sc = str2[1].split(' ')[0].split('am')[0].trim() + " am";
+							result += sc + " = ";
+						}
+						else {
+							sc = str2[1].split(' ')[0].split('pm')[0].trim() + " pm";
+							if(!sc.split(':')[0].includes('12')) {
+								sc = (parseInt(sc.split(':')[0])+12)+":"+sc.split(':')[1];
+							}
+							//result += str2[1].split(' ')[0] + " = </br>";
+							result += sc + " = ";
+						}
+						
+					}
+				var subtract = "";
+				var first1 = parseInt(fr.split(' ')[0].split(':')[0]);
+				var second1 = parseInt(fr.split(' ')[0].split(':')[1]);
+				var first2 = parseInt(sc.split(' ')[0].split(':')[0]);
+				var second2 = parseInt(sc.split(' ')[0].split(':')[1]);
+				var min1 = (first1*60)+second1;
+				var min2 = (first2*60)+second2;
+				//if((fr.includes('am') && sc.includes('pm'))) {
+				//	min1 = ((first1+12)*60)+second1;
+				//	min2 = (first2*60)+second2;
+				//}
+				if((fr.includes('pm') && sc.includes('am') && first2 == 12)) {
+					min1 = (first1*60)+second1;
+					min2 = ((first2+12)*60)+second2;
+				}
+				if((fr.includes('pm') && sc.includes('am') && first2 != 12)) {
+					min1 = ((first1-12)*60)+second1;
+					min2 = ((first2+12)*60)+second2;
+				}
+				if((fr.includes('am') && sc.includes('am') && first1 == 12)) {
+					min1 = (first1*60)+second1;
+					min2 = ((first2+12)*60)+second2;
+				}
+				if((fr.includes('pm') && sc.includes('pm') && first1 == 12)) {
+					min1 = ((first1-12)*60)+second1;
+					min2 = ((first2-12)*60)+second2;
+				}
+				var minTot = Math.abs(min1-min2);
+				projectTime += minTot;
+				var hours = Math.floor(minTot / 60);          
+    				var minutes = minTot % 60;
+				result += (hours) + ":" + (minutes) + " Hrs </br>";
+			}
+				
+			}	
+			var totProjectTime = (Math.floor(projectTime / 60)) + ":" + (projectTime % 60);
+			result += "</br></br> Total Project Time = " + totProjectTime + " Hrs";
+				
+			document.getElementById('print').innerHTML = result;
+  			};
+
+  			fileReader.readAsText(fileToLoad, "UTF-8");
+
+			
+			}
+      	</script>
+ 	</body>
+</html>
